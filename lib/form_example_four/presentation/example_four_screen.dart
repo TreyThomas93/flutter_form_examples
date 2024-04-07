@@ -19,8 +19,8 @@ class _ExampleOneScreenState extends ConsumerState<ExampleFourScreen> {
 
   void _submitForm() async {
     if (_formKey.currentState!.validate()) {
-      ref.read(formController.notifier).submit();
-      // ref.read(formController.notifier).submitSync();
+      // ref.read(formController.notifier).submit();
+      ref.read(formController.notifier).submitSync();
     }
   }
 

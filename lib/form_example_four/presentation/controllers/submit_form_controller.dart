@@ -42,9 +42,8 @@ class SubmitFormController extends AutoDisposeNotifier<SubmitFormState?> {
     }
   }
 
-  void submitSync(Function() callBack,
-      [String? submittingMessage, String? submittedMessage]) {
-    state = SubmitFormState.submitting(submittingMessage);
+  void submitSync(Function() callBack, [String? submittedMessage]) {
+    state = const SubmitFormState.submitting();
     try {
       callBack();
       state = SubmitFormState.success(submittedMessage);
