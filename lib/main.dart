@@ -3,6 +3,7 @@ import 'package:flutter_form_examples/extensions.dart';
 import 'package:flutter_form_examples/form_example_four/presentation/controllers/form_controller.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'form_example_five/presentation/form_example.dart';
 import 'form_example_four/presentation/controllers/submit_form_controller.dart';
 import 'form_example_four/presentation/example_four_screen.dart';
 import 'form_example_one/presentation/example_one_screen.dart';
@@ -55,7 +56,7 @@ class MyApp extends ConsumerWidget {
         useMaterial3: true,
       ),
       navigatorKey: navigatorKey,
-      home: const ExampleFourScreen(),
+      home: const FormExample(),
     );
   }
 }

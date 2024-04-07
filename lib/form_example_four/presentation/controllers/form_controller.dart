@@ -55,6 +55,7 @@ class FormController extends Notifier<FormModel> {
   void submitSync() {
     ref.read(submitFormController.notifier).submitSync(() {
       print(state);
+      throw Exception(state);
       print('syncs submit');
     }, 'syncs submit successfully');
   }
