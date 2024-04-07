@@ -49,13 +49,13 @@ class FormController extends Notifier<FormModel> {
       print(state);
       await Future.delayed(const Duration(seconds: 2));
       print('async submit');
-    });
+    }, 'submitting async form', 'async form submitted successfully');
   }
 
   void submitSync() {
     ref.read(submitFormController.notifier).submitSync(() {
       print(state);
       print('syncs submit');
-    });
+    }, null, 'syncs submit successfully');
   }
 }

@@ -29,14 +29,15 @@ class MyApp extends ConsumerWidget {
       final context = navigatorKey.currentContext!;
 
       switch (state) {
-        case Submitting():
+        case Submitting(:final message):
+          print(message);
           context.showLoadingCircle();
           break;
-        case Success():
+        case Success(:final message):
           context.pop();
           FocusManager.instance.primaryFocus?.unfocus();
           ref.invalidate(formController);
-          context.showSnackBar('Form submitted');
+          context.showSnackBar(message ?? 'Form submitted');
           break;
         case Error():
           context.pop();

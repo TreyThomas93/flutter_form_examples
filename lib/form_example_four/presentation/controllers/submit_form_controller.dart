@@ -31,21 +31,23 @@ class SubmitFormController extends AutoDisposeNotifier<SubmitFormState?> {
   @override
   SubmitFormState? build() => null;
 
-  Future<void> submit(Future<void> Function() callBack) async {
-    state = const SubmitFormState.submitting();
+  Future<void> submit(Future<void> Function() callBack,
+      [String? submittingMessage, String? submittedMessage]) async {
+    state = SubmitFormState.submitting(submittingMessage);
     try {
       await callBack();
-      state = const SubmitFormState.success();
+      state = SubmitFormState.success(submittedMessage);
     } catch (e, stackTrace) {
       state = SubmitFormState.error(e, stackTrace);
     }
   }
 
-  void submitSync(Function() callBack) {
-    state = const SubmitFormState.submitting();
+  void submitSync(Function() callBack,
+      [String? submittingMessage, String? submittedMessage]) {
+    state = SubmitFormState.submitting(submittingMessage);
     try {
       callBack();
-      state = const SubmitFormState.success();
+      state = SubmitFormState.success(submittedMessage);
     } catch (e, stackTrace) {
       state = SubmitFormState.error(e, stackTrace);
     }
@@ -56,18 +58,22 @@ class SubmitFormController extends AutoDisposeNotifier<SubmitFormState?> {
 sealed class SubmitFormState {
   const SubmitFormState();
 
-  const factory SubmitFormState.submitting() = Submitting;
-  const factory SubmitFormState.success() = Success;
+  const factory SubmitFormState.submitting([String? message]) = Submitting;
+  const factory SubmitFormState.success([String? message]) = Success;
   const factory SubmitFormState.error(Object error, StackTrace stackTrace) =
       Error;
 }
 
 class Submitting extends SubmitFormState {
-  const Submitting();
+  const Submitting([this.message]);
+
+  final String? message;
 }
 
 class Success extends SubmitFormState {
-  const Success();
+  const Success([this.message]);
+
+  final String? message;
 }
 
 class Error extends SubmitFormState implements ErrorBase {
