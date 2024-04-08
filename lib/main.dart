@@ -52,11 +52,15 @@ class MyApp extends ConsumerWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        // inputdecoration
+        inputDecorationTheme: const InputDecorationTheme(
+          border: OutlineInputBorder(),
+          contentPadding: EdgeInsets.all(10),
+        ),
         useMaterial3: true,
       ),
       navigatorKey: navigatorKey,
-      home: const FormExample(),
+      home: const SafeArea(child: FormExample()),
     );
   }
 }

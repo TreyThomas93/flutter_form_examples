@@ -9,7 +9,8 @@ class ProviderLogger extends ProviderObserver {
     StackTrace stackTrace,
     ProviderContainer container,
   ) {
-    print(error.toString());
+    print(error);
+    print(stackTrace);
   }
 
   @override

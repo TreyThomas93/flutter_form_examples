@@ -1,5 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -7,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 
 import 'package:flutter_form_examples/extensions.dart';
+import 'package:flutter_form_examples/form_example_five/presentation/controllers/submit_form_controller.dart';
 import 'package:flutter_form_examples/form_example_five/presentation/providers/form_providers.dart';
 
 class FormExample extends ConsumerStatefulWidget {
@@ -43,12 +45,27 @@ class _FormExampleState extends ConsumerState<FormExample> {
 
   @override
   Widget build(BuildContext context) {
+    ref.listen(submitFormController, (previous, state) {
+      state?.when(
+        submitting: (message) {},
+        none: () {},
+        submitted: (message) {
+          FocusManager.instance.primaryFocus?.unfocus();
+          context.showSnackBar(message ?? 'Form submitted');
+        },
+        error: (error, stackTrace) {
+          FocusManager.instance.primaryFocus?.unfocus();
+          context.showErrorSnackBar('Error submitting form');
+        },
+      );
+    });
+
     final facilities = ref.watch(facilityProvider(showAllPatients));
     final patients = ref.watch(patientProvider((showAllPatients, facility)));
     final services = ref.watch(serviceProvider);
     return Scaffold(
       body: Padding(
-        padding: const EdgeInsets.all(30.0),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
         child: FormBuilder(
             initialValue: _initialFormValues,
             key: _formKey,
@@ -117,6 +134,12 @@ class _FormExampleState extends ConsumerState<FormExample> {
                   validator: FormBuilderValidators.compose([
                     FormBuilderValidators.required(),
                   ]),
+                  valueTransformer: (value) {
+                    if (value is DateTime) {
+                      return DateTime(value.year, value.month, value.day);
+                    }
+                    return value;
+                  },
                 ),
                 const SizedBox(height: 20),
                 // start time picker
@@ -127,6 +150,12 @@ class _FormExampleState extends ConsumerState<FormExample> {
                   validator: FormBuilderValidators.compose([
                     FormBuilderValidators.required(),
                   ]),
+                  valueTransformer: (value) {
+                    if (value is DateTime) {
+                      return TimeOfDay.fromDateTime(value);
+                    }
+                    return value;
+                  },
                 ),
                 const SizedBox(height: 20),
                 // end time picker
@@ -137,27 +166,39 @@ class _FormExampleState extends ConsumerState<FormExample> {
                   validator: FormBuilderValidators.compose([
                     FormBuilderValidators.required(),
                   ]),
+                  valueTransformer: (value) {
+                    if (value is DateTime) {
+                      return TimeOfDay.fromDateTime(value);
+                    }
+                    return value;
+                  },
                 ),
+                const SizedBox(height: 20),
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () async {
                       // Validate and save the form values
-                      _formKey.currentState?.saveAndValidate();
-                      debugPrint(_formKey.currentState?.value.toString());
-                      FocusManager.instance.primaryFocus?.unfocus();
+                      // _formKey.currentState?.saveAndValidate();
+                      // debugPrint(_formKey.currentState?.value.toString());
+                      // FocusManager.instance.primaryFocus?.unfocus();
 
                       // On another side, can access all field values without saving form with instantValues
-                      if (_formKey.currentState?.validate() == false) return;
+                      if (_formKey.currentState?.saveAndValidate() == false) {
+                        return;
+                      }
 
-                      debugPrint(
-                          _formKey.currentState?.instantValue.toString());
-
-                      context.showSnackBar('Form submitted');
-
-                      _formKey.currentState?.reset();
-                      _patientKey.currentState?.reset();
-                      _serviceKey.currentState?.reset();
+                      ref.read(submitFormController.notifier).submitSync(() {
+                        final session = Session(
+                          facility!,
+                          patient!,
+                          service!,
+                          _formKey.currentState?.value['date'],
+                          _formKey.currentState?.value['start time'],
+                          _formKey.currentState?.value['end time'],
+                        );
+                        log(session.toString());
+                      }, 'Session added');
                       return;
 
                       context.showLoadingCircle();
@@ -178,5 +219,22 @@ class _FormExampleState extends ConsumerState<FormExample> {
             )),
       ),
     );
+  }
+}
+
+class Session {
+  final String facility;
+  final Patient patient;
+  final Service service;
+  final DateTime date;
+  final TimeOfDay startTime;
+  final TimeOfDay endTime;
+
+  Session(this.facility, this.patient, this.service, this.date, this.startTime,
+      this.endTime);
+
+  @override
+  String toString() {
+    return 'Session(facility: $facility, patient: $patient, service: $service, date: $date, startTime: $startTime, endTime: $endTime)';
   }
 }
